@@ -24,10 +24,31 @@ namespace UptownZoo.Models.Tests {
 
         [TestMethod]
         public void GetAnimals_ShouldReturnAllAnimalsSortedBySpecies() {
-            // Set up a Mock databse and Mock animal tables
+            // Arrange
+            Mock<DbSet<Animals>> mockAnimals = GetAnimalMockDBSet();
+
+            //Create mock database
+            var mockDB = new Mock<ApplicationDbContext>();
+            mockDB.Setup(db => db.Animals).Returns(mockAnimals.Object);
+
+            //Act
+            IEnumerable<Animals> allAnimals = AnimalService.GetAllAnimals(mockDB.Object);
+
+            //Assert all animals are returned
+            Assert.AreEqual(3, allAnimals.Count());
+
+            // Assert animals sorted by species
+            Assert.AreEqual("Elephant", allAnimals.ElementAt(0).Species);
+            Assert.AreEqual("Zebra", allAnimals.ElementAt(2).Species);
+        }
+
+        private Mock<DbSet<Animals>> GetAnimalMockDBSet() {
             var mockAnimals = new Mock<DbSet<Animals>>();
 
             mockAnimals.As<IQueryable<Animals>>().Setup(m => m.Provider).Returns(animals.Provider);
+            mockAnimals.As<IQueryable<Animals>>().Setup(m => m.Expression).Returns(animals.Expression);
+            mockAnimals.As<IQueryable<Animals>>().Setup(m => m.GetEnumerator()).Returns(animals.GetEnumerator());
+            return mockAnimals;
         }
     }
 }
