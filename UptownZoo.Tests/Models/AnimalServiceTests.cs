@@ -25,11 +25,10 @@ namespace UptownZoo.Models.Tests {
         [TestMethod]
         public void GetAnimals_ShouldReturnAllAnimalsSortedBySpecies() {
             // Arrange
-            Mock<DbSet<Animals>> mockAnimals = GetAnimalMockDBSet();
+            Mock<DbSet<Animals>> mockAnimals = GetMockAnimalDBSet();
 
             //Create mock database
-            var mockDB = new Mock<ApplicationDbContext>();
-            mockDB.Setup(db => db.Animals).Returns(mockAnimals.Object);
+            var mockDB = GetMockDB(mockAnimals);
 
             //Act
             IEnumerable<Animals> allAnimals = AnimalService.GetAllAnimals(mockDB.Object);
@@ -42,7 +41,41 @@ namespace UptownZoo.Models.Tests {
             Assert.AreEqual("Zebra", allAnimals.ElementAt(2).Species);
         }
 
-        private Mock<DbSet<Animals>> GetAnimalMockDBSet() {
+        [TestMethod]
+        public void AddAnimal_NewAnimalShouldCallAddAndSaveChanges() {
+            Mock<DbSet<Animals>> mockAnimals = GetMockAnimalDBSet();
+
+            Mock<ApplicationDbContext> mockDB = GetMockDB(mockAnimals);
+
+            Animals beast = new Animals() {
+                Species = "Tiger"
+            };
+
+            AnimalService.AddAnimal(beast, mockDB.Object);
+
+            // Make sure the AddAnimal method truly got called (only once) from AnimalService class
+            mockAnimals.Verify(m => m.Add(beast), Times.Once);
+
+            // Make sure animal was added to the mock database
+            mockDB.Verify(m => m.SaveChanges(), Times.Once);
+        }
+
+        [TestMethod]
+        public void AddAnimal_NullAnimal_ShouldThrowArgumentNullException() {
+            Animals a = null; // Lol
+
+            // Assert => Act
+            Assert.ThrowsException<ArgumentNullException>(() => AnimalService.AddAnimal(a, new ApplicationDbContext())); // Empty parathesis for new method
+        }
+
+        private static Mock<ApplicationDbContext> GetMockDB(Mock<DbSet<Animals>> mockAnimals) {
+            var mockDB = new Mock<ApplicationDbContext>();
+
+            mockDB.Setup(db => db.Animals).Returns(mockAnimals.Object);
+            return mockDB;
+        }
+
+        private Mock<DbSet<Animals>> GetMockAnimalDBSet() {
             var mockAnimals = new Mock<DbSet<Animals>>();
 
             mockAnimals.As<IQueryable<Animals>>().Setup(m => m.Provider).Returns(animals.Provider);

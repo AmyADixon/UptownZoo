@@ -18,5 +18,17 @@ namespace UptownZoo.Models {
             // OR
             //return db.Animals.OrderBy(a => a.Name).ToList();
         }
+
+        public static void AddAnimal(Animals beast, ApplicationDbContext db) {
+            if(beast is null) {
+                throw new ArgumentNullException($"Parameter {nameof(beast)} cannot be null");
+            }
+
+            // To Do: Ensure that duplicate species are not allowed
+
+            db.Animals.Add(beast);
+
+            db.SaveChanges();
+        }
     }
 }
