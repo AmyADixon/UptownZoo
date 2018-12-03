@@ -29,5 +29,8 @@ namespace UptownZoo.Models
         {
             return new ApplicationDbContext();
         }
+
+        //public System.Data.Entity.DbSet<UptownZoo.Models.Animals> Animals { get; set; }
+        public virtual DbSet<Animals> Animals { get; set; }
     }
 }

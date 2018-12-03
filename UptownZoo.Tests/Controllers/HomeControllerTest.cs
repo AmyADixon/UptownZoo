@@ -11,39 +11,35 @@ namespace UptownZoo.Tests.Controllers {
     [TestClass]
     public class HomeControllerTest {
         [TestMethod]
-        public void Index() {
+        public void Index_RetrurnsNonNullViewResult() {
             // Arrange
             HomeController controller = new HomeController();
 
             // Act
-            ViewResult result = controller.Index() as ViewResult;
+            ViewResult result =  controller.Index() as ViewResult;
 
             // Assert
             Assert.IsNotNull(result);
         }
 
         [TestMethod]
-        public void About() {
-            // Arrange
-            HomeController controller = new HomeController();
+        public void About_ReturnsNonNullViewResult() {
+            HomeController home = new HomeController();
 
-            // Act
-            ViewResult result = controller.About() as ViewResult;
+            ViewResult result = home.About() as ViewResult;
 
-            // Assert
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        public void About_ShouldHaveViewBagMessage() {
+            HomeController home = new HomeController();
+
+            ViewResult result = home.About() as ViewResult;
+
+            Assert.IsNotNull(result.ViewBag.Message);
+
             Assert.AreEqual("Your application description page.", result.ViewBag.Message);
-        }
-
-        [TestMethod]
-        public void Contact() {
-            // Arrange
-            HomeController controller = new HomeController();
-
-            // Act
-            ViewResult result = controller.Contact() as ViewResult;
-
-            // Assert
-            Assert.IsNotNull(result);
         }
     }
 }
